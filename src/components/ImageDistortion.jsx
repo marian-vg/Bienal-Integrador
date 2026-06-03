@@ -130,7 +130,7 @@ const ImageDistortion = ({ imageSrc, className = "" }) => {
       console.error("Error loading texture:", err);
     });
 
-    // 6. Mouse Interaction Handlers
+    // 6. Mouse & Touch Interaction Handlers
     const handleMouseMove = (event) => {
       const rect = container.getBoundingClientRect();
       const x = (event.clientX - rect.left) / rect.width;
@@ -143,8 +143,25 @@ const ImageDistortion = ({ imageSrc, className = "" }) => {
       targetMouseRef.current = { x: -10.0, y: -10.0 };
     };
 
+    const handleTouchMove = (event) => {
+      if (event.touches.length > 0) {
+        const touch = event.touches[0];
+        const rect = container.getBoundingClientRect();
+        const x = (touch.clientX - rect.left) / rect.width;
+        const y = 1.0 - (touch.clientY - rect.top) / rect.height; // Invert Y for WebGL
+        targetMouseRef.current = { x, y };
+      }
+    };
+
+    const handleTouchEnd = () => {
+      targetMouseRef.current = { x: -10.0, y: -10.0 };
+    };
+
     container.addEventListener('mousemove', handleMouseMove);
     container.addEventListener('mouseleave', handleMouseLeave);
+    container.addEventListener('touchstart', handleTouchMove, { passive: true });
+    container.addEventListener('touchmove', handleTouchMove, { passive: true });
+    container.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     // 7. Resize Handler
     const handleResize = () => {
@@ -189,6 +206,9 @@ const ImageDistortion = ({ imageSrc, className = "" }) => {
       window.removeEventListener('resize', handleResize);
       container.removeEventListener('mousemove', handleMouseMove);
       container.removeEventListener('mouseleave', handleMouseLeave);
+      container.removeEventListener('touchstart', handleTouchMove);
+      container.removeEventListener('touchmove', handleTouchMove);
+      container.removeEventListener('touchend', handleTouchEnd);
       
       if (renderer) {
         renderer.dispose();

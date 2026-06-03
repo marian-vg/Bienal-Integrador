@@ -146,5 +146,72 @@ Este archivo registra las tareas realizadas, decisiones de diseño, resultados o
     *   Esto permite compensar la relación de aspecto de la imagen vectorial e incrementar el espacio de renderizado vertical, asegurando que todos los detalles y el texto de la imagen de presentación sean visibles sin recortes por el efecto aspect-ratio de WebGL.
 *   **Verificación**: Construcción de producción con `pnpm run build` ejecutada exitosamente sin errores (23 módulos, 0 errores).
 
+## 03 de Junio, 2026 - Planificación de Refactorización y Animaciones de Interfaz Móvil Desacoplada
+
+### Tareas Realizadas
+*   **Planificación de la Arquitectura Móvil Desacoplada**:
+    *   Definición del plan de desarrollo para separar los componentes de Hero e Inicio en versiones exclusivas para móvil y escritorio (`HeroDesktop`/`HeroMobile`, `ConceptsDesktop`/`ConceptsMobile`) a fin de desacoplar lógicas de diseño responsivo complejas y evitar conflictos de rendimiento en dispositivos táctiles.
+    *   Planificación del hook de detección dinámica de tamaño de pantalla `useMediaQuery.js`.
+    *   Planificación del hook animador de scroll reutilizable `useScrollReveal.js` que utiliza Intersection Observer nativo del navegador.
+    *   Documentación de este plan técnico en [implementation_plan.md](file:///C:/Users/Administrador/herd/Bienal-Integrador/implementation_plan.md).
+
+## 03 de Junio, 2026 - Desarrollo de la Interfaz Móvil Desacoplada y Animaciones de Scroll
+
+### Tareas Realizadas
+*   **Creación de Hooks React**:
+    *   Creado `src/hooks/useMediaQuery.js` para detectar dinámicamente si el viewport es móvil/táctil (`max-width: 1023px`).
+    *   Creado `src/hooks/useScrollReveal.js` que implementa un `IntersectionObserver` reutilizable con configuraciones personalizables (revelado único, retardos, márgenes de activación).
+*   **Integración de Soporte Táctil en WebGL**:
+    *   Actualizado `src/components/ImageDistortion.jsx` para registrar escuchadores de eventos táctiles (`touchstart`, `touchmove`, `touchend`) con políticas pasivas de desplazamiento, lo que habilita la distorsión líquida interactiva en pantallas móviles al arrastrar el dedo.
+*   **Configuración de Animaciones CSS**:
+    *   Se agregaron las clases `.reveal-hidden` (estado base con opacidad, desplazamiento y desenfoque) y `.reveal-visible` (estado final con aceleración de GPU) en [index.css](file:///C:/Users/Administrador/herd/Bienal-Integrador/src/index.css).
+    *   Se agregaron clases utilitarias de retardo progresivo (`reveal-delay-100` a `reveal-delay-400`) para simular efectos de cascada en listados.
+*   **Desacoplamiento e Implementación**:
+    *   **Inicio (Hero)**:
+      *   Creado `HeroDesktop.jsx` (100vh + 10px, distorsión por cursor).
+      *   Creado `HeroMobile.jsx` (100dvh para adaptarse a barras de navegación de teléfonos móviles).
+      *   Reescrito [Hero.jsx](file:///C:/Users/Administrador/herd/Bienal-Integrador/src/components/Hero.jsx) para conmutar dinámicamente usando el hook `useMediaQuery`.
+    *   **Conceptos (Concepts)**:
+      *   Creado `ConceptsDesktop.jsx` (layout de 12 columnas con margen de 10px a la izquierda y spotlight cards).
+      *   Creado `ConceptsMobile.jsx` (layout apilado verticalmente, con efectos de scroll reveal en el título, la imagen y cascada progresiva de tarjetas, además de respuesta táctil `active:scale-95`).
+      *   Reescrito [Concepts.jsx](file:///C:/Users/Administrador/herd/Bienal-Integrador/src/components/Concepts.jsx) para conmutar dinámicamente usando el hook `useMediaQuery`.
+*   **Verificación**: Construcción de producción con `pnpm run build` ejecutada exitosamente sin errores (29 módulos transformados, 0 errores).
+
+## 03 de Junio, 2026 - Integración de GSAP + ScrollTrigger para Narrativa Táctil Móvil
+
+### Tareas Realizadas
+*   **Instalación de Dependencias**:
+    *   Se instaló `gsap` (versión 3.15.0) en el entorno local a través de `pnpm`.
+*   **Creación de Layout Unificado de Historia Móvil**:
+    *   Creado [MobileLayout.jsx](file:///C:/Users/Administrador/herd/Bienal-Integrador/src/components/MobileLayout.jsx) que centraliza la experiencia móvil en una sola sección con comportamiento de anclaje de pantalla (`pin: true`) y control de reproducción reversible sincronizado al tacto y scroll (`scrub: 1`).
+    *   **Línea de tiempo de GSAP (Paso a Paso)**:
+      1. El logotipo e isotipo de la bienal comienzan grandes en el centro del viewport con fondo negro. Al avanzar el scroll, el logo se reduce a la mitad y se desplaza suavemente a la esquina superior izquierda (`top: 16px`, `left: 24px`, `scale: 0.5`) para integrarse con la cabecera, mientras la imagen del Hero se revela.
+      2. La imagen de presentación (Hero) se mantiene completamente visible y luego se desvanece de `opacity: 1` a `0`.
+      3. La imagen conceptual de Conceptos se revela de `opacity: 0` a `1`.
+      4. Las tarjetas de Conceptos (con fondo de panel de cristal) emergen desde el fondo en cascada progresiva individual, mientras que el canvas de fondo de Conceptos se atenúa de `opacity: 1` a `0.4` para garantizar máxima legibilidad.
+      5. Al finalizar las animaciones, la pantalla se desancla y se puede scrollar libremente hacia el Footer académico.
+    *   **Navbar flotante móvil**: Se integró un menú hamburguesa de interacción rápida en el encabezado flotante que permite navegar mediante scroll fluido a las posiciones clave del timeline de scroll (`Inicio` a scroll 0, `Conceptos` a 2.5x la altura de la pantalla).
+*   **Rutado Condicional**:
+    *   Actualizado [App.jsx](file:///C:/Users/Administrador/herd/Bienal-Integrador/src/App.jsx) para rutear todo el flujo de forma exclusiva hacia `<MobileLayout />` en dispositivos móviles, desacoplando por completo el árbol de componentes móvil del de escritorio.
+*   **Verificación**: Construcción de producción con `pnpm run build` ejecutada exitosamente sin errores (35 módulos transformados, 0 errores).
+
+## 03 de Junio, 2026 - Refinamiento Secuencial de Timeline GSAP y Contraste de Tarjetas Móviles (V5.0)
+
+### Tareas Realizadas
+*   **Separación Secuencial del Logo y Hero**:
+    *   Se modificó el timeline de GSAP en [MobileLayout.jsx](file:///C:/Users/Administrador/herd/Bienal-Integrador/src/components/MobileLayout.jsx) para desfasar la animación del logo y de la imagen Hero. Al hacer scroll hacia abajo, primero se traslada el logo hacia el navbar manteniendo el fondo en negro absoluto. Luego, al seguir scrolleando, comienza la transición de acercamiento y opacidad de la imagen de presentación (Hero).
+*   **Repetición de Efecto Zoom en Conceptos**:
+    *   Se refinó la transición de la imagen de Conceptos para que siga exactamente el mismo ciclo inmersivo que la de presentación: aparece y se acerca (escala de `0.8` a `1.0`), se detiene brevemente en pantalla completa, y al seguir desplazándose se aleja de nuevo (escala de `1.0` a `0.8`).
+*   **Capa de Fondo Oscura Integrada (Backdrop Overlay)**:
+    *   Se insertó un elemento div absolute (`conceptsOverlayRef`) con fondo negro profundo (`#0c0102`) y z-index 25, situado justo por encima de la imagen de conceptos (`z-20`) pero por debajo de las tarjetas conceptuales (`z-30`).
+    *   En la línea de tiempo de GSAP, al llegar al despliegue de las tarjetas, esta capa aumenta su opacidad suavemente de `0` a `0.85`, atenuando progresivamente el fondo de los conceptos para brindar un contraste perfecto y legibilidad excepcional a las tarjetas.
+*   **Optimización de Estilos de Tarjetas en Azul Oscuro**:
+    *   Siguiendo el feedback del usuario, se ajustó el color de fondo de las tarjetas en [MobileLayout.jsx](file:///C:/Users/Administrador/herd/Bienal-Integrador/src/components/MobileLayout.jsx) y [ConceptsMobile.jsx](file:///C:/Users/Administrador/herd/Bienal-Integrador/src/components/ConceptsMobile.jsx) hacia un azul oscuro premium (`#112240`/`bg-[#112240]/95`) con un borde azul sutilmente iluminado (`#3b82f6/25`). Este tono es claramente azul y contrasta maravillosamente con el fondo vino tinto ultra oscuro del sitio sin resultar apagado.
+    *   Se mejoraron los efectos táctiles móviles (`active:scale-97`, `active:bg-[#2563eb]/30`, y `active:border-[#2563eb]/60`) para una respuesta táctil instantánea y satisfactoria.
+*   **Ajuste de Navegación del Menú Móvil**:
+    *   Se actualizó el cálculo de scroll en la navegación interna: la sección de "Conceptos" desplaza el scroll a `3.0x` la altura de la pantalla, alineándose de forma exacta con la nueva escala de tiempo (`end: "+=550%"`) en la que los conceptos están completamente legibles en pantalla.
+*   **Verificación**:
+    *   Compilación de producción exitosa a través de `pnpm run build` sin advertencias ni errores (dist/assets transformados y empaquetados).
+
 ### Próximos Pasos
-1.  Iniciar el servidor de desarrollo local para validar la nitidez, nuevo tamaño y proporciones en el navegador.
+1. Realizar una validación visual interactiva en múltiples viewports móviles emulados para corroborar la fluidez del timeline y las transiciones de zoom consecutivas.

@@ -64,3 +64,27 @@ html, body {
   box-shadow: 0 10px 30px -10px rgba(230, 57, 70, 0.15);
   transform: translateY(-4px);
 }
+
+/* Scroll Reveal Utility Classes */
+.reveal-hidden {
+  opacity: 0;
+  transform: translateY(24px);
+  filter: blur(4px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+              filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform, filter;
+}
+
+.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* Staggered delay helpers for cascading slide-ins */
+.reveal-delay-100 { transition-delay: 100ms !important; }
+.reveal-delay-200 { transition-delay: 200ms !important; }
+.reveal-delay-300 { transition-delay: 300ms !important; }
+.reveal-delay-400 { transition-delay: 400ms !important; }
+

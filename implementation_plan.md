@@ -53,3 +53,21 @@ La página será de una única interfaz (single-page landing) enfocada en la pre
 - [x] Asegurar total adaptabilidad mobile (responsive design).
 - [x] Verificar rendimiento de renderizado del Canvas de Three.js para evitar lag en dispositivos móviles (mediante limitación de FPS/pixel ratio).
 
+### Fase 5: Refactorización y Animación de Interfaz Móvil Desacoplada
+- [ ] **Creación de Hooks React**:
+  - [ ] Diseñar `src/hooks/useMediaQuery.js` para detectar de forma reactiva si el viewport es móvil/tablet (`max-width: 1023px`).
+  - [ ] Diseñar `src/hooks/useScrollReveal.js` para observar la visibilidad de los elementos en el viewport usando la API nativa de `IntersectionObserver` y gestionar la inyección de clases de revelado.
+- [ ] **Desacoplamiento de Componentes de Presentación**:
+  - [ ] **Sección de Inicio (Hero)**:
+    - [ ] Crear `HeroDesktop.jsx` con el diseño actual (100vh + 10px, distorsión WebGL interactiva controlada por cursor).
+    - [ ] Crear `HeroMobile.jsx` (altura de 100vh, distorsión WebGL automática basada en `u_time` e interacción breve `onTouchMove`).
+    - [ ] Modificar `Hero.jsx` como conmutador dinámico usando `useMediaQuery`.
+  - [ ] **Sección de Conceptos (Concepts)**:
+    - [ ] Crear `ConceptsDesktop.jsx` con el diseño actual (rejilla 12 cols, 75% imagen, margen izquierdo de 10px, efecto spotlight hover en tarjetas).
+    - [ ] Crear `ConceptsMobile.jsx` (apilamiento vertical, animaciones de entrada en scroll tipo fade/scale, efecto activo táctil simplificado sin hover en las tarjetas).
+    - [ ] Modificar `Concepts.jsx` como conmutador dinámico usando `useMediaQuery`.
+- [ ] **Animaciones de Scroll & Táctiles**:
+  - [ ] Configurar las clases CSS de revelado y transición en `src/index.css`.
+  - [ ] Implementar la aparición en cascada progresiva (staggered delay) para las tarjetas de conceptos en móvil.
+  - [ ] Configurar efectos `active:scale-95` de transición táctil en móviles para mantener la interactividad.
+
