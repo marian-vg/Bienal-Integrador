@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import ImageDistortion from './ImageDistortion';
 import Footer from './Footer';
 
 // Register ScrollTrigger plugin
@@ -27,18 +26,28 @@ const MobileLayout = () => {
     // Center translation: center of image aligns with center of screen
     const centerTranslation = maxTranslation / 2;
 
-    // Set initial centered styles for the logo
+    // Measure logo dimensions for GPU-accelerated centering (FLIP technique)
+    const logoRect = logoRef.current.getBoundingClientRect();
+    const logoW = logoRect.width || 230; // fallback width
+    const logoH = logoRect.height || 120; // fallback height
+    
+    // Calculate translate offsets from static top-left (24px, 16px) to viewport center
+    const logoStartX = (viewportWidth / 2) - 24 - (logoW / 2);
+    const logoStartY = (viewportHeight / 2) - 16 - (logoH / 2);
+
+    // Set initial centered transform for the logo using x and y instead of top/left
     gsap.set(logoRef.current, {
-      xPercent: -50,
-      yPercent: -50,
-      top: "50%",
-      left: "50%"
+      x: logoStartX,
+      y: logoStartY,
+      scale: 1.0,
+      transformOrigin: "top left"
     });
 
-    // Set initial scale (70%), opacity (0), and position (centered) for transition images
-    gsap.set(heroImgRef.current, { scale: 0.7, opacity: 0, x: centerTranslation });
-    gsap.set(conceptsImgRef.current, { scale: 0.7, opacity: 0, x: centerTranslation });
-    gsap.set(glowsRef.current, { opacity: 1 });
+    // Set initial scale (70%), autoAlpha (0), and position (centered) for transition images
+    gsap.set(heroImgRef.current, { scale: 0.7, autoAlpha: 0, x: centerTranslation });
+    gsap.set(conceptsImgRef.current, { scale: 0.7, autoAlpha: 0, x: centerTranslation });
+    gsap.set(glowsRef.current, { autoAlpha: 1 });
+    gsap.set(cardsContainerRef.current, { autoAlpha: 0 });
 
     // Create GSAP context for safe React 18 cleaning
     const ctx = gsap.context(() => {
@@ -53,26 +62,24 @@ const MobileLayout = () => {
         }
       });
 
-      // 1. Logo scales/moves to top-left (navbar header position) & Diffused glows fade out
+      // 1. Logo moves to top-left (navbar header position x=0, y=0) & Diffused glows fade out
+      // We only animate GPU-accelerated transforms (x, y, scale) instead of layout properties (top, left)
       tl.to(logoRef.current, {
-        top: "16px",
-        left: "24px",
-        xPercent: 0,
-        yPercent: 0,
+        x: 0,
+        y: 0,
         scale: 0.5,
-        transformOrigin: "top left",
         duration: 1.5,
         ease: "power2.inOut"
       }, 0)
       .to(glowsRef.current, {
-        opacity: 0,
+        autoAlpha: 0,
         duration: 1.5,
         ease: "power2.inOut"
       }, 0);
 
       // 2. Hero image fades in & zooms in (scale 0.7 -> 1.0) while sliding to the left edge (x: center -> 0)
       tl.to(heroImgRef.current, {
-        opacity: 1,
+        autoAlpha: 1,
         scale: 1.0,
         x: 0,
         duration: 2.0,
@@ -88,7 +95,7 @@ const MobileLayout = () => {
 
       // 4. Hero image fades out and zooms out (1.0 -> 0.7) while returning to the center (x: maxTranslation -> center)
       tl.to(heroImgRef.current, {
-        opacity: 0,
+        autoAlpha: 0,
         scale: 0.7,
         x: centerTranslation,
         duration: 2.0,
@@ -97,7 +104,7 @@ const MobileLayout = () => {
 
       // 5. Concepts image fades in & zooms in (scale 0.7 -> 1.0) while sliding to the left edge (x: center -> 0)
       tl.to(conceptsImgRef.current, {
-        opacity: 1,
+        autoAlpha: 1,
         scale: 1.0,
         x: 0,
         duration: 2.0,
@@ -115,24 +122,24 @@ const MobileLayout = () => {
       //    - Concepts image fades opacity (normal opacity showing background details), zooms out (scale 1.0 -> 0.8) and returns to the center (x: maxTranslation -> center)
       //    - Cards container fades in and slides up
       tl.to(conceptsImgRef.current, {
-        opacity: 0.1, // 35% opacity (30% less than 65% for a much more noticeable fade)
+        opacity: 0.1, // Keeping opacity 0.1 so it's semi-visible (autoAlpha: 0.1 is also fine, since it's > 0)
         scale: 0.8,
         x: centerTranslation,
         duration: 2.0,
         ease: "power2.inOut"
       }, "cardsEnter")
       .to(cardsContainerRef.current, {
-        opacity: 1,
+        autoAlpha: 1,
         y: 0,
         duration: 2.0,
         ease: "power2.out"
       }, "cardsEnter");
 
       // 8. Staggered reveal for each concept card
-      tl.fromTo(".mobile-card-1", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 })
-        .fromTo(".mobile-card-2", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 })
-        .fromTo(".mobile-card-3", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 })
-        .fromTo(".mobile-card-4", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 });
+      tl.fromTo(".mobile-card-1", { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.6 })
+        .fromTo(".mobile-card-2", { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.6 })
+        .fromTo(".mobile-card-3", { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.6 })
+        .fromTo(".mobile-card-4", { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.6 });
 
       // 9. End spacer to hold final view before unpinning
       tl.to({}, { duration: 1.0 });
@@ -217,8 +224,8 @@ const MobileLayout = () => {
           <div className="absolute top-[48%] left-[50%] w-[60vw] h-[60vw] max-w-[300px] max-h-[300px] rounded-full bg-white/5 blur-[100px] -translate-x-1/2 -translate-y-1/2" />
         </div>
 
-        {/* 1. Animated Logo Wrapper */}
-        <div ref={logoRef} className="mobile-logo absolute z-50 flex flex-col items-center gap-2 text-center pointer-events-none select-none">
+        {/* 1. Animated Logo Wrapper - statically positioned at top-4 left-6, animated via GPU x/y transforms */}
+        <div ref={logoRef} className="mobile-logo absolute top-4 left-6 z-50 flex flex-col items-center gap-2 text-center pointer-events-none select-none">
           <img 
             src="/documentacion/logo-bienal.svg" 
             alt="Bienal Logo" 
@@ -233,25 +240,27 @@ const MobileLayout = () => {
           </span>
         </div>
 
-        {/* 2. Hero Distorted Image (fades in, then fades out, panned horizontally) */}
+        {/* 2. Hero Image (fades in, then fades out, panned horizontally) */}
         <div 
           ref={heroImgRef} 
           className="absolute top-0 left-0 h-[100dvh] w-[141.4dvh] max-w-none opacity-0 z-10 pointer-events-none"
         >
-          <ImageDistortion 
-            imageSrc="/documentacion/presentacion-bienal.svg" 
-            className="w-full h-full rounded-none shadow-none border-none" 
+          <img 
+            src="/documentacion/presentacion-bienal.svg" 
+            alt="Presentación Bienal"
+            className="w-full h-full object-cover rounded-none shadow-none border-none" 
           />
         </div>
 
-        {/* 3. Concepts Distorted Image (fades in, then dims to 50% opacity, panned horizontally) */}
+        {/* 3. Concepts Image (fades in, then dims to 50% opacity, panned horizontally) */}
         <div 
           ref={conceptsImgRef} 
           className="absolute top-0 left-0 h-[100dvh] w-[141.4dvh] max-w-none opacity-0 z-20 pointer-events-none"
         >
-          <ImageDistortion 
-            imageSrc="/documentacion/conceptos-bienal.svg" 
-            className="w-full h-full rounded-none shadow-none border-none" 
+          <img 
+            src="/documentacion/conceptos-bienal.svg" 
+            alt="Conceptos Bienal"
+            className="w-full h-full object-cover rounded-none shadow-none border-none" 
           />
         </div>
 

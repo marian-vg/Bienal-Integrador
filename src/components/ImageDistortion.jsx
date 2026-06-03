@@ -179,26 +179,57 @@ const ImageDistortion = ({ imageSrc, className = "" }) => {
 
     window.addEventListener('resize', handleResize);
 
-    // 8. Animation Loop
+    // 8. Animation Loop with IntersectionObserver and visibility optimizations
     let animationFrameId;
+    let isIntersecting = false; // start as false, observer will trigger it on mount if visible
     const clock = new THREE.Clock();
 
     const animate = () => {
-      animationFrameId = requestAnimationFrame(animate);
+      if (!isIntersecting) return; // Stop drawing if not intersecting (will resume when observer fires)
 
-      // Lerp mouse positions for smooth organic transition (faster response)
-      mouseRef.current.x += (targetMouseRef.current.x - mouseRef.current.x) * 0.25;
-      mouseRef.current.y += (targetMouseRef.current.y - mouseRef.current.y) * 0.25;
+      // GSAP changes opacity and visibility styles on the parent container.
+      // We check them to skip the expensive renderer.render() call if the element is invisible.
+      const parent = container.parentElement;
+      const opacity = parent ? parent.style.opacity : container.style.opacity;
+      const visibility = parent ? parent.style.visibility : container.style.visibility;
+      const isVisible = (opacity === "" || parseFloat(opacity) > 0.01) && visibility !== "hidden";
 
-      if (material) {
-        material.uniforms.u_time.value = clock.getElapsedTime();
-        material.uniforms.u_mouse.value.set(mouseRef.current.x, mouseRef.current.y);
+      if (isVisible) {
+        // Lerp mouse positions for smooth organic transition (faster response)
+        mouseRef.current.x += (targetMouseRef.current.x - mouseRef.current.x) * 0.25;
+        mouseRef.current.y += (targetMouseRef.current.y - mouseRef.current.y) * 0.25;
+
+        if (material) {
+          material.uniforms.u_time.value = clock.getElapsedTime();
+          material.uniforms.u_mouse.value.set(mouseRef.current.x, mouseRef.current.y);
+        }
+
+        renderer.render(scene, camera);
       }
 
-      renderer.render(scene, camera);
+      // Continue the animation loop only if intersecting
+      animationFrameId = requestAnimationFrame(animate);
     };
 
-    animate();
+    // 8.5 Setup Intersection Observer to pause drawing when offscreen
+    let observer;
+    if (typeof window !== 'undefined' && 'IntersectionObserver' in window) {
+      observer = new IntersectionObserver((entries) => {
+        const entry = entries[0];
+        const newIntersecting = entry.isIntersecting;
+        
+        if (newIntersecting && !isIntersecting) {
+          isIntersecting = true;
+          animate();
+        } else {
+          isIntersecting = newIntersecting;
+        }
+      }, { threshold: 0.01 });
+      
+      observer.observe(container);
+    } else {
+      animate(); // Fallback if IntersectionObserver is not supported
+    }
 
     // 9. Cleanup on unmount
     return () => {
@@ -209,6 +240,10 @@ const ImageDistortion = ({ imageSrc, className = "" }) => {
       container.removeEventListener('touchstart', handleTouchMove);
       container.removeEventListener('touchmove', handleTouchMove);
       container.removeEventListener('touchend', handleTouchEnd);
+      
+      if (observer) {
+        observer.disconnect();
+      }
       
       if (renderer) {
         renderer.dispose();
