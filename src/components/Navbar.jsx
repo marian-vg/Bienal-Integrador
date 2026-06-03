@@ -31,7 +31,7 @@ const Navbar = () => {
         {/* Logo */}
         <a href="#inicio" className="flex items-center gap-3 group">
           <img 
-            src="/documentacion/logo-bienal.webp" 
+            src="/documentacion/logo-nuevo-bienal.webp" 
             alt="Bienal Logo" 
             className="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
             onError={(e) => {

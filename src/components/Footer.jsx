@@ -17,7 +17,7 @@ const Footer = ({ isMobile = false }) => {
         <div className="flex flex-col items-center md:items-start text-center md:text-left space-y-2">
           <div className="flex items-center gap-2">
             <img 
-              src="/documentacion/logo-bienal.webp" 
+              src="/documentacion/logo-nuevo-bienal.webp" 
               alt="Bienal Logo" 
               className="h-8 w-auto object-contain"
               onError={(e) => { e.target.style.display = 'none'; }}

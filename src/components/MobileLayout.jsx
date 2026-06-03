@@ -73,7 +73,7 @@ const MobileLayout = () => {
         }
       });
 
-      // 1. Logo moves to top-left (navbar header position x=0, y=0) & Diffused glows fade out
+      // 1. Logo moves to top-left (navbar header position x=0, y=0) & Diffused glows fade out & text shadow fades
       // We only animate GPU-accelerated transforms (x, y, scale) instead of layout properties (top, left)
       tl.to(logoRef.current, {
         x: 0,
@@ -84,6 +84,16 @@ const MobileLayout = () => {
       }, 0)
       .to(glowsRef.current, {
         autoAlpha: 0,
+        duration: 1.5,
+        ease: "power2.inOut"
+      }, 0)
+      .to(".logo-title-text", {
+        textShadow: "0px 0px 0px rgba(0, 0, 0, 0)",
+        duration: 1.5,
+        ease: "power2.inOut"
+      }, 0)
+      .to(".logo-subtitle-text", {
+        textShadow: "0px 0px 0px rgba(0, 0, 0, 0)",
         duration: 1.5,
         ease: "power2.inOut"
       }, 0);
@@ -238,15 +248,21 @@ const MobileLayout = () => {
         {/* 1. Animated Logo Wrapper - statically positioned at top-4 left-6, animated via GPU x/y transforms */}
         <div ref={logoRef} className="mobile-logo absolute top-4 left-6 z-50 flex flex-col items-center gap-2 text-center pointer-events-none select-none">
           <img 
-            src="/documentacion/logo-bienal.webp" 
+            src="/documentacion/logo-nuevo-bienal.webp" 
             alt="Bienal Logo" 
-            className="h-16 w-auto object-contain" 
+            className="h-16 w-16 object-cover rounded-full shadow-[0_8px_24px_rgba(0,0,0,0.95)]" 
             onError={(e) => { e.target.style.display = 'none'; }}
           />
-          <span className="font-display font-black text-xl tracking-wider text-white">
+          <span 
+            className="font-display font-black text-xl tracking-wider text-white logo-title-text"
+            style={{ textShadow: "0px 4px 12px rgba(0, 0, 0, 0.85)" }}
+          >
             BIENAL<span className="text-color-bienal-red">.</span>UNL
           </span>
-          <span className="text-[10px] text-slate-500 font-sans tracking-wide">
+          <span 
+            className="text-[10px] text-slate-500 font-sans tracking-wide logo-subtitle-text"
+            style={{ textShadow: "0px 2px 8px rgba(0, 0, 0, 0.9)" }}
+          >
             Lic. en Comunicación Visual • FADU - UNL
           </span>
         </div>
