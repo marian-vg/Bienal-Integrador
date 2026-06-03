@@ -233,10 +233,10 @@ const MobileLayout = () => {
             onError={(e) => { e.target.style.display = 'none'; }}
           />
           <span className="font-display font-black text-xl tracking-wider text-white">
-            BIENAL<span className="text-color-bienal-red">.</span>UTN
+            BIENAL<span className="text-color-bienal-red">.</span>UNL
           </span>
           <span className="text-[10px] text-slate-500 font-sans tracking-wide">
-            Lic. en Comunicación Visual • FADU - UTN
+            Lic. en Comunicación Visual • FADU - UNL
           </span>
         </div>
 

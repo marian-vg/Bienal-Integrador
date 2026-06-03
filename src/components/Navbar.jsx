@@ -39,7 +39,7 @@ const Navbar = () => {
             }}
           />
           <span className="font-display font-extrabold text-xl tracking-wider text-white">
-            BIENAL<span className="text-color-bienal-red">.</span>UTN
+            BIENAL<span className="text-color-bienal-red">.</span>UNL
           </span>
         </a>
 

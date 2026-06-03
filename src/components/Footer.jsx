@@ -23,17 +23,17 @@ const Footer = ({ isMobile = false }) => {
               onError={(e) => { e.target.style.display = 'none'; }}
             />
             <span className="font-display font-black text-lg tracking-wider text-white">
-              BIENAL<span className="text-color-bienal-red">.</span>UTN
+              BIENAL<span className="text-color-bienal-red">.</span>UNL
             </span>
           </div>
           <span className="text-xs text-slate-500 font-sans">
-            Lic. en Comunicación Visual • FADU - UTN
+            Lic. en Comunicación Visual • FADU - UNL
           </span>
         </div>
 
         {/* Copyright info */}
         <div className="text-center md:text-right font-sans text-xs text-slate-500 space-y-1">
-          <p>© {currentYear} Bienal UTN. Todos los derechos reservados.</p>
+          <p>© {currentYear} Bienal UNL. Todos los derechos reservados.</p>
           <p>Hecho con fines académicos y de presentación visual.</p>
         </div>
 
