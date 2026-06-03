@@ -7,7 +7,7 @@ const Hero = () => {
       {/* Full Viewport Interactive WebGL Image */}
       <div className="absolute inset-0 w-full">
         <ImageDistortion 
-          imageSrc="/documentacion/presentacion-bienal.svg" 
+          imageSrc="/documentacion/presentacion-bienal.webp" 
           className="w-full h-full rounded-none shadow-none border-none" 
         />
       </div>

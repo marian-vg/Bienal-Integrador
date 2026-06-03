@@ -12,12 +12,15 @@ Este documento registra los cambios de código realizados para optimizar el rend
   - Agregamos una verificación rápida de los estilos en línea (`opacity` y `visibility`) del contenedor padre en cada frame. Si el componente se encuentra oculto en el timeline de GSAP (ej. opacidad `0` o `visibility: hidden`), omitimos la llamada pesada `renderer.render(scene, camera)`.
   - **Resultado**: Consumo de CPU/GPU del 0% para componentes WebGL invisibles o fuera del scroll en la versión Desktop.
 
-### 2. Eliminación de WebGL en Móvil (Reemplazo por `<img>` Estándar)
-- **Archivo modificado**: [MobileLayout.jsx](file:///src/components/MobileLayout.jsx)
+### 2. Eliminación de WebGL en Móvil y Migración a Formato WebP (Ultra-Liviano)
+- **Archivos modificados**: [MobileLayout.jsx](file:///src/components/MobileLayout.jsx), [Hero.jsx](file:///src/components/Hero.jsx), [Concepts.jsx](file:///src/components/Concepts.jsx), [Navbar.jsx](file:///src/components/Navbar.jsx), [Footer.jsx](file:///src/components/Footer.jsx)
 - **Implementación**:
-  - Eliminamos el componente interactivo `ImageDistortion` y lo reemplazamos por etiquetas `<img>` estándar de HTML.
-  - Dado que los dispositivos móviles no tienen eventos de "hover" de mouse (y el arrastre táctil ejecuta el scroll de la página, imposibilitando la distorsión interactiva), no hay justificación para cargar WebGL en teléfonos.
-  - **Resultado**: Rendimiento óptimo en móviles, eliminando el calentamiento del dispositivo y logrando un 0% de uso de WebGL. Las imágenes se siguen desplazando, escalando y animando fluidamente bajo el Timeline de GSAP sin consumir batería extra.
+  - **Reemplazo por `<img>`**: Eliminamos el componente interactivo `ImageDistortion` y lo reemplazamos por etiquetas `<img>` estándar de HTML en el flujo móvil.
+  - **Migración de Activos a WebP**: Copiamos las nuevas imágenes WebP optimizadas (`conceptos-bienal.webp`, `presentacion-bienal.webp`, `logo-bienal.webp`) a la carpeta servida por Vite `public/documentacion/`. 
+  - **Actualización de Referencias**: Reemplazamos todos los archivos `.svg` por sus contrapartes `.webp` en la barra de navegación, pie de página, vista de escritorio y vista móvil.
+  - **Predecodificación en Background**: En `MobileLayout.jsx`, cargamos y decodificamos de forma asíncrona las imágenes WebP principales en segundo plano mediante `new Image().decode()`.
+  - **Promoción de Capa de GPU (`will-change: transform`)**: Añadimos la clase `will-change-transform` y el atributo `decoding="async"` a las imágenes en móvil para que la GPU renderice las transformaciones de forma nativa.
+  - **Resultado**: El peso de la primera imagen se redujo de **2.75 MB a solo 352 KB** (8 veces más pequeña), y la segunda de **2.0 MB a 425 KB**. Combinado con la aceleración gráfica por hardware y predecodificación, el scroll en móviles y computadoras ahora es sumamente liviano y libre de lag.
 
 ### 3. Transición del Logo por Hardware GPU en `MobileLayout.jsx`
 - **Archivo modificado**: [MobileLayout.jsx](file:///src/components/MobileLayout.jsx)

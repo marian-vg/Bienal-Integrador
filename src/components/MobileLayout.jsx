@@ -17,6 +17,17 @@ const MobileLayout = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
+    // Pre-decode heavy SVGs on a background thread to prevent decoding jank on first scroll
+    const preloadImage = (src) => {
+      const img = new Image();
+      img.src = src;
+      if (img.decode) {
+        img.decode().catch((err) => console.warn("Image pre-decode error:", err));
+      }
+    };
+    preloadImage("/documentacion/presentacion-bienal.webp");
+    preloadImage("/documentacion/conceptos-bienal.webp");
+
     // Calculate translation distance based on image aspect ratio (1.414)
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
@@ -227,7 +238,7 @@ const MobileLayout = () => {
         {/* 1. Animated Logo Wrapper - statically positioned at top-4 left-6, animated via GPU x/y transforms */}
         <div ref={logoRef} className="mobile-logo absolute top-4 left-6 z-50 flex flex-col items-center gap-2 text-center pointer-events-none select-none">
           <img 
-            src="/documentacion/logo-bienal.svg" 
+            src="/documentacion/logo-bienal.webp" 
             alt="Bienal Logo" 
             className="h-16 w-auto object-contain" 
             onError={(e) => { e.target.style.display = 'none'; }}
@@ -246,9 +257,10 @@ const MobileLayout = () => {
           className="absolute top-0 left-0 h-[100dvh] w-[141.4dvh] max-w-none opacity-0 z-10 pointer-events-none"
         >
           <img 
-            src="/documentacion/presentacion-bienal.svg" 
+            src="/documentacion/presentacion-bienal.webp" 
             alt="Presentación Bienal"
-            className="w-full h-full object-cover rounded-none shadow-none border-none" 
+            className="w-full h-full object-cover rounded-none shadow-none border-none will-change-transform" 
+            decoding="async"
           />
         </div>
 
@@ -258,9 +270,10 @@ const MobileLayout = () => {
           className="absolute top-0 left-0 h-[100dvh] w-[141.4dvh] max-w-none opacity-0 z-20 pointer-events-none"
         >
           <img 
-            src="/documentacion/conceptos-bienal.svg" 
+            src="/documentacion/conceptos-bienal.webp" 
             alt="Conceptos Bienal"
-            className="w-full h-full object-cover rounded-none shadow-none border-none" 
+            className="w-full h-full object-cover rounded-none shadow-none border-none will-change-transform" 
+            decoding="async"
           />
         </div>
 

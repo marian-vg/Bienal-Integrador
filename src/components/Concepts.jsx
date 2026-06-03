@@ -77,7 +77,7 @@ const Concepts = () => {
           <div className="lg:col-span-9 aspect-[4/3] relative rounded-2xl overflow-hidden border border-white/5 bg-slate-900 shadow-2xl">
             {/* WebGL Image Distortion canvas */}
             <ImageDistortion 
-              imageSrc="/documentacion/conceptos-bienal.svg" 
+              imageSrc="/documentacion/conceptos-bienal.webp" 
               className="w-full h-full" 
             />
           </div>
