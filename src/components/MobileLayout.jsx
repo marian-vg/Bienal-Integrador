@@ -285,29 +285,27 @@ const MobileLayout = () => {
             <span className="text-[10px] font-bold uppercase tracking-widest text-color-bienal-red animate-pulse block">
               Manifiesto Visual
             </span>
-            <h2 className="font-display font-black text-2xl text-white leading-none">
+            <h2 className="font-disruptive font-extrabold text-3xl text-white leading-none tracking-tight">
               Conceptos
             </h2>
           </div>
-
-          {/* Staggered Touch Concept Cards (Styled dark blue with custom active states) */}
+          {/* Staggered Touch Concept Cards (Styled dark blue with custom active states, styled with Rubik Glitch) */}
           <div className="mobile-card-1 border border-[#3b82f6]/25 bg-[#112240]/45 backdrop-blur-lg p-4 rounded-xl flex items-center gap-4 active:scale-97 active:bg-[#2563eb]/30 active:border-[#2563eb]/60 transition-all duration-300 cursor-pointer">
-            <span className="font-display font-black text-xl text-white/20">01</span>
-            <h3 className="font-display font-bold text-md text-white">Transformación</h3>
+            <span className="font-glitch text-2xl text-white/35">01</span>
+            <h3 className="font-glitch text-xl italic text-white tracking-wide">Transformación</h3>
           </div>
           <div className="mobile-card-2 border border-[#3b82f6]/25 bg-[#112240]/45 backdrop-blur-lg p-4 rounded-xl flex items-center gap-4 active:scale-97 active:bg-[#2563eb]/30 active:border-[#2563eb]/60 transition-all duration-300 cursor-pointer">
-            <span className="font-display font-black text-xl text-white/20">02</span>
-            <h3 className="font-display font-bold text-md text-white">Disruptivo</h3>
+            <span className="font-glitch text-2xl text-white/35">02</span>
+            <h3 className="font-glitch text-xl italic text-white tracking-wide">Disruptivo</h3>
           </div>
           <div className="mobile-card-3 border border-[#3b82f6]/25 bg-[#112240]/45 backdrop-blur-lg p-4 rounded-xl flex items-center gap-4 active:scale-97 active:bg-[#2563eb]/30 active:border-[#2563eb]/60 transition-all duration-300 cursor-pointer">
-            <span className="font-display font-black text-xl text-white/20">03</span>
-            <h3 className="font-display font-bold text-md text-white">Contrastante</h3>
+            <span className="font-glitch text-2xl text-white/35">03</span>
+            <h3 className="font-glitch text-xl italic text-white tracking-wide">Contrastante</h3>
           </div>
           <div className="mobile-card-4 border border-[#3b82f6]/25 bg-[#112240]/45 backdrop-blur-lg p-4 rounded-xl flex items-center gap-4 active:scale-97 active:bg-[#2563eb]/30 active:border-[#2563eb]/60 transition-all duration-300 cursor-pointer">
-            <span className="font-display font-black text-xl text-white/20">04</span>
-            <h3 className="font-display font-bold text-md text-white">Explosivo</h3>
+            <span className="font-glitch text-2xl text-white/35">04</span>
+            <h3 className="font-glitch text-xl italic text-white tracking-wide">Explosivo</h3>
           </div>
-
         </div>
 
       </div>

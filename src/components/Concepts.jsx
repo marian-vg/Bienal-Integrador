@@ -40,13 +40,13 @@ const SpotlightCard = ({ title, number }) => {
       )}
 
       {/* Concept Number */}
-      <span className="font-display font-black text-2xl transition-colors duration-300"
+      <span className="font-glitch text-2xl transition-colors duration-300"
             style={{ color: isHovered ? 'rgba(230, 57, 70, 0.6)' : 'rgba(255, 255, 255, 0.12)' }}>
         {number}
       </span>
 
       {/* Concept Title */}
-      <h3 className="font-display font-bold text-sm md:text-base text-white tracking-wide transition-colors duration-300">
+      <h3 className="font-glitch text-sm md:text-base text-white tracking-wide transition-colors duration-300">
         {title}
       </h3>
     </div>
@@ -55,8 +55,16 @@ const SpotlightCard = ({ title, number }) => {
 
 const Concepts = () => {
   return (
-    <section id="conceptos" className="w-full min-h-screen py-24 bg-color-bienal-dark-red flex items-center justify-center border-t border-white/5 relative">
+    <section id="conceptos" className="w-full min-h-screen py-24 bg-color-bienal-dark-red flex items-center justify-center border-t border-white/5 relative overflow-hidden">
       
+      {/* Background Pulsating Diffused Ambient Glows (z-0 to remain behind text/content) */}
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+        {/* Red Glow (Bottom Left) */}
+        <div className="absolute bottom-[20%] left-[10%] w-[60vw] h-[60vw] max-w-[500px] max-h-[500px] rounded-full bg-[#e63946] blur-[120px] animate-glow-pulse" style={{ animationDelay: '0s' }} />
+        {/* Blue Glow (Top Right) */}
+        <div className="absolute top-[25%] right-[5%] w-[60vw] h-[60vw] max-w-[500px] max-h-[500px] rounded-full bg-[#2563eb] blur-[120px] animate-glow-pulse" style={{ animationDelay: '-5s' }} />
+      </div>
+
       {/* Purely textual Title Overlay, absolute positioned at the TOP-RIGHT of the entire SECTION, with a top margin */}
       <div className="absolute top-16 right-6 md:right-12 z-10 text-right pointer-events-none select-none space-y-1">
         <span className="text-[11px] font-bold uppercase tracking-widest text-color-bienal-red animate-pulse block">
@@ -67,18 +75,19 @@ const Concepts = () => {
         </h2>
       </div>
 
-      {/* Expanded container (added pt-20 on mobile to push grid down, left-aligned to the screen on desktop with 10px margin) */}
-      <div className="w-full max-w-[92vw] xl:max-w-[88vw] mx-auto lg:max-w-none lg:mx-0 lg:pl-[10px] lg:pr-12 flex flex-col gap-12 px-4 lg:px-0 pt-20 lg:pt-0">
+      {/* Expanded container with z-10 to stack on top of background glows */}
+      <div className="w-full max-w-[92vw] xl:max-w-[88vw] mx-auto lg:max-w-none lg:mx-0 lg:pl-[10px] lg:pr-12 flex flex-col gap-12 px-4 lg:px-0 pt-20 lg:pt-0 relative z-10">
         
         {/* Expanded Grid Layout to make image 10% larger (9/12 instead of 7/10) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
-          {/* 75% Width Image Container (using 9 out of 12 grid columns, aspect-4/3) */}
-          <div className="lg:col-span-9 aspect-[4/3] relative rounded-2xl overflow-hidden border border-white/5 bg-slate-900 shadow-2xl">
+          {/* 75% Width Image Container (using 9 out of 12 grid columns, aspect-4/3) with heavy premium shadow */}
+          <div className="lg:col-span-9 aspect-[4/3] relative rounded-2xl overflow-hidden border border-white/5 bg-[#0f0203] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.95),_0_20px_40px_-10px_rgba(230,57,70,0.55)]">
             {/* WebGL Image Distortion canvas */}
             <ImageDistortion 
               imageSrc="/documentacion/conceptos-bienal.webp" 
               className="w-full h-full" 
+              passiveWaves={false}
             />
           </div>
 

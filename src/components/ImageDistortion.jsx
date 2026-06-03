@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
-const ImageDistortion = ({ imageSrc, className = "" }) => {
+const ImageDistortion = ({ imageSrc, className = "", passiveWaves = true }) => {
   const containerRef = useRef(null);
   
   // Keep track of mouse positions for smooth interpolation (lerp)
@@ -44,6 +44,7 @@ const ImageDistortion = ({ imageSrc, className = "" }) => {
       uniform float u_time;
       uniform float u_aspect;
       uniform float u_imageAspect;
+      uniform float u_passive_strength;
 
       void main() {
         vec2 uv = vUv;
@@ -82,9 +83,11 @@ const ImageDistortion = ({ imageSrc, className = "" }) => {
           // Apply displacement to UV coordinates
           uv += dir * (strength * factor + wave);
         } else {
-          // Very subtle general breathing wave for extra premium organic feel
-          float breathing = sin(u_time * 1.5 + uv.y * 8.0) * 0.0006;
-          uv.x += breathing;
+          // Continuous, gentle, and elegant liquid wave animation (reduced further for extreme subtlety)
+          float waveX = sin(u_time * 1.5 + uv.y * 7.0) * 0.0013 * u_passive_strength;
+          float waveY = cos(u_time * 1.2 + uv.x * 7.0) * 0.0008 * u_passive_strength;
+          uv.x += waveX;
+          uv.y += waveY;
         }
         
         // Clamp UVs to prevent edge repetition wrapping artifacts
@@ -117,7 +120,8 @@ const ImageDistortion = ({ imageSrc, className = "" }) => {
           u_mouse: { value: new THREE.Vector2(-10.0, -10.0) },
           u_time: { value: 0.0 },
           u_aspect: { value: width / height },
-          u_imageAspect: { value: imageAspect }
+          u_imageAspect: { value: imageAspect },
+          u_passive_strength: { value: passiveWaves ? 1.0 : 0.0 }
         },
         transparent: true
       });
@@ -255,7 +259,7 @@ const ImageDistortion = ({ imageSrc, className = "" }) => {
       if (geometry) geometry.dispose();
       if (material) material.dispose();
     };
-  }, [imageSrc]);
+  }, [imageSrc, passiveWaves]);
 
   return (
     <div 

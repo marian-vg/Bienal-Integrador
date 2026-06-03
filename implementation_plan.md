@@ -1,41 +1,52 @@
-# Plan de Optimización de Rendimiento - Bienal Integrador
+# Plan de Implementación - Refinamiento Estético y Tipográfico (Bienal Integrador)
 
-Este documento detalla las estrategias para optimizar el rendimiento y reducir el consumo de cómputo (CPU y GPU) causado por las animaciones de GSAP y los lienzos interactivos de WebGL (Three.js).
+Este plan detalla los pasos para realizar ajustes finos sobre la versión Desktop y actualizar la tipografía de la versión Mobile para una presentación disruptiva y original, acorde a la identidad de una Bienal de Diseño.
 
-## Diagnóstico de Cuellos de Botella
+## Cambios Propuestos
 
-1. **Renderizado de WebGL Continuo (Gasto Innecesario de GPU)**:
-   - El componente `ImageDistortion` inicia un ciclo de renderizado continuo (`requestAnimationFrame`) que dibuja la escena en cada frame.
-   - En **Escritorio**, el lienzo de `Concepts` se renderiza constantemente incluso si el usuario está en el Hero (fuera de la vista).
-   - En **Móvil**, tanto el lienzo del `Hero` como el de `Concepts` están en el DOM y se renderizan simultáneamente en segundo plano, aunque uno de ellos tenga opacidad `0`.
-   
-2. **Reflows de Layout (Gasto de CPU en Timeline)**:
-   - En `MobileLayout.jsx`, la animación del logo modifica las propiedades `top` y `left` de `"50%"` a `"16px"` y `"24px"`.
-   - Modificar propiedades de diseño como `top`, `left`, `width`, `height` fuerza al navegador a recalcular el árbol de diseño (Layout/Reflow) en cada tick del ScrollTrigger. Esto causa tartamudeos (stuttering) especialmente en dispositivos móviles.
+### 1. Refinamiento en Desktop
 
-3. **Opacidad vs Visibilidad**:
-   - Elementos con opacidad `0` siguen siendo procesados por el motor de renderizado del navegador y consumen recursos de composición web.
+#### A. Reducción de la Intensidad del Movimiento Pasivo (en un 25-30%)
+- **Archivo**: [ImageDistortion.jsx](file:///src/components/ImageDistortion.jsx)
+- **Implementación**: Disminuiremos la amplitud de las ondas del fragment shader para lograr un movimiento pasivo aún más sutil y refinado.
+  - Valores actuales: `0.0018` en X y `0.0012` en Y.
+  - Nuevos valores optimizados: `0.0013` en X y `0.0008` en Y (reducción aproximada del 30%).
+  ```glsl
+  float waveX = sin(u_time * 1.5 + uv.y * 7.0) * 0.0013 * u_passive_strength;
+  float waveY = cos(u_time * 1.2 + uv.x * 7.0) * 0.0008 * u_passive_strength;
+  ```
+
+#### B. Mayor Contraste en la Sombra de la Imagen de Conceptos
+- **Archivo**: [Concepts.jsx](file:///src/components/Concepts.jsx)
+- **Implementación**: Para destacar la tarjeta sobre el fondo oscuro (`#0c0102`), incrementaremos la opacidad y dispersión de la sombra ambiental roja.
+  - Anterior: `shadow-[...,_0_20px_50px_-20px_rgba(230,57,70,0.25)]`
+  - Nueva Sombra Acentuada:
+    `shadow-[0_30px_60px_-15px_rgba(0,0,0,0.95),_0_20px_40px_-10px_rgba(230,57,70,0.55)]`
+  - Al duplicar la opacidad del halo rojo (de `0.25` a `0.55`) y ajustar la dispersión, la sombra creará un brillo tipo neon/retroiluminado muy visible.
 
 ---
 
-## Plan de Acción
+### 2. Actualización de Tipografía y Tarjetas en Mobile y Desktop
 
-### Paso 1: Optimización de WebGL en `ImageDistortion.jsx`
-Implementaremos dos niveles de control de ciclo para pausar el renderizado cuando no sea visible:
-1. **IntersectionObserver**: Pausar completamente el bucle de `requestAnimationFrame` cuando el contenedor salga del viewport (ideal para Desktop).
-2. **Detección de Visibilidad en el Parent (Inline Styles)**: En el bucle de animación, comprobar si el contenedor o su padre directo tienen `opacity === "0"` o `visibility === "hidden"`. Si es así, saltarse la llamada a `renderer.render()`. Leer estilos inline (`style.opacity`) es inmediato y no provoca reflows de diseño.
+#### A. Importación del Nuevo Font "Rubik Glitch" (Local .ttf para Producción)
+- **Archivo**: [index.css](file:///src/index.css)
+- **Implementación**: 
+  - Usaremos los archivos locales `.ttf` (por ejemplo, `src/assets/fonts/RubikGlitch-Regular.ttf` y `src/assets/fonts/Barriecito-Regular.ttf`) mediante `@font-face` en `index.css`.
+  - Definiremos las variables tipográficas en el bloque `@theme` de Tailwind:
+    ```css
+    --font-glitch: 'Rubik Glitch', system-ui;
+    --font-barriecito: 'Barriecito', system-ui;
+    ```
 
-### Paso 2: Eliminación de Layout Thrashing en `MobileLayout.jsx`
-Reemplazar la animación de layout (`top`/`left`) del logo por transformaciones de matriz (`x`, `y` y `scale` aceleradas por GPU):
-1. Posicionar el logo de forma estática en su destino final (`top: 16px`, `left: 24px`) mediante CSS.
-2. Al montar el componente (`useEffect`), calcular la distancia matemática (Delta X y Delta Y) desde la posición inicial (esquina superior izquierda) hasta el centro de la pantalla.
-3. Usar `gsap.set` para aplicar esa traslación inicial `x` e `y` y `scale: 1.0` (para que aparezca centrado como Hero).
-4. En el timeline, animar `x` e `y` a `0` y `scale` a `0.5`. Al usar solo transformaciones 3D/2D, la animación se ejecutará al 100% en la GPU (compositor thread) sin provocar reflows.
-
-### Paso 3: Uso de `autoAlpha` en GSAP
-Modificar las animaciones del timeline en `MobileLayout.jsx` para que usen `autoAlpha` en lugar de `opacity`:
-- `autoAlpha` es una propiedad especial de GSAP que combina `opacity` y `visibility`. Cuando `autoAlpha` llega a `0`, GSAP aplica automáticamente `visibility: hidden` al elemento, retirándolo del flujo de renderizado activo del navegador.
-
-### Paso 4: Pruebas y Verificación
-- Verificar que las animaciones visualmente sigan siendo idénticas y fluidas.
-- Confirmar que los renderizadores de Three.js detienen sus ciclos y llamadas a `render` cuando están ocultos u offscreen.
+#### B. Estilizar Tarjetas con Rubik Glitch
+- **Archivos**: [MobileLayout.jsx](file:///src/components/MobileLayout.jsx), [Concepts.jsx](file:///src/components/Concepts.jsx)
+- **Implementación**:
+  - Cambiaremos la tipografía de los títulos y los números indicativos de las tarjetas conceptuales para usar `font-glitch` (tanto en Desktop como en Mobile).
+  - Mantendremos el título "Conceptos" con la fuente normal/disruptiva sin aplicar el glitch, para que no interfiera en la legibilidad global.
+  - Ejemplo de clase de tarjeta en Mobile:
+    ```jsx
+    <div className="mobile-card-1 border border-[#3b82f6]/25 bg-[#112240]/45 backdrop-blur-lg p-4 rounded-xl flex items-center gap-4 ...">
+      <span className="font-glitch text-2xl text-white/35">01</span>
+      <h3 className="font-glitch text-lg text-white tracking-wide">Transformación</h3>
+    </div>
+    ```
